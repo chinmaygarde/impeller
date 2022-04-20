@@ -24,6 +24,15 @@ bool Command::BindVertices(const VertexBuffer& buffer) {
   return true;
 }
 
+BufferView Command::GetVertexBuffer() const {
+  auto found = vertex_bindings.buffers.find(
+      VertexDescriptor::kReservedVertexBufferIndex);
+  if (found != vertex_bindings.buffers.end()) {
+    return found->second;
+  }
+  return {};
+}
+
 bool Command::BindResource(ShaderStage stage, size_t binding, BufferView view) {
   if (!view) {
     return false;

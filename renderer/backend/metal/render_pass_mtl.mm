@@ -131,8 +131,7 @@ static MTLRenderPassDescriptor* ToMTLRenderPassDescriptor(
 RenderPassMTL::RenderPassMTL(id<MTLCommandBuffer> buffer, RenderTarget target)
     : RenderPass(std::move(target)),
       buffer_(buffer),
-      desc_(ToMTLRenderPassDescriptor(GetRenderTarget())),
-      transients_buffer_(HostBuffer::Create()) {
+      desc_(ToMTLRenderPassDescriptor(GetRenderTarget())) {
   if (!buffer_ || !desc_ || !render_target_.IsValid()) {
     return;
   }
@@ -141,10 +140,6 @@ RenderPassMTL::RenderPassMTL(id<MTLCommandBuffer> buffer, RenderTarget target)
 }
 
 RenderPassMTL::~RenderPassMTL() = default;
-
-HostBuffer& RenderPassMTL::GetTransientsBuffer() {
-  return *transients_buffer_;
-}
 
 bool RenderPassMTL::IsValid() const {
   return is_valid_;
@@ -489,37 +484,6 @@ bool RenderPassMTL::EncodeCommands(Allocator& allocator,
                         baseVertex:command.base_vertex
                       baseInstance:0u];
   }
-  return true;
-}
-
-bool RenderPassMTL::AddCommand(Command command) {
-  if (!command) {
-    VALIDATION_LOG << "Attempted to add an invalid command to the render pass.";
-    return false;
-  }
-
-  if (command.scissor.has_value()) {
-    auto target_rect = IRect({}, render_target_.GetRenderTargetSize());
-    if (!target_rect.Contains(command.scissor.value())) {
-      VALIDATION_LOG << "Cannot apply a scissor that lies outside the bounds "
-                        "of the render target.";
-      return false;
-    }
-  }
-
-  if (command.index_count == 0u) {
-    // Essentially a no-op. Don't record the command but this is not necessary
-    // an error either.
-    return true;
-  }
-
-  if (command.instance_count == 0u) {
-    // Essentially a no-op. Don't record the command but this is not necessary
-    // an error either.
-    return true;
-  }
-
-  commands_.emplace_back(std::move(command));
   return true;
 }
 

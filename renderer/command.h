@@ -116,6 +116,8 @@ struct Command {
                     std::shared_ptr<const Texture> texture,
                     std::shared_ptr<const Sampler> sampler);
 
+  BufferView GetVertexBuffer() const;
+
   constexpr operator bool() const { return pipeline && pipeline->IsValid(); }
 };
 

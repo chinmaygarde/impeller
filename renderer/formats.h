@@ -86,8 +86,6 @@ enum class BlendOperation {
   kAdd,
   kSubtract,
   kReverseSubtract,
-  kMin,
-  kMax,
 };
 
 enum class LoadAction {

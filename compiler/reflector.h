@@ -27,6 +27,7 @@ struct StructMember {
 class Reflector {
  public:
   struct Options {
+    std::string entry_point_name;
     std::string shader_name;
     std::string header_file_name;
   };

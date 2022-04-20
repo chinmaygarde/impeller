@@ -17,9 +17,18 @@ config("impeller_public_config") {
     defines += [ "IMPELLER_SUPPORTS_RENDERING=1" ]
   }
 
+  if (impeller_enable_metal) {
+    defines += [ "IMPELLER_ENABLE_METAL=1" ]
+  }
+
+  if (impeller_enable_opengles) {
+    defines += [ "IMPELLER_ENABLE_OPENGLES=1" ]
+  }
+
   if (is_win) {
     defines += [
       "_USE_MATH_DEFINES",
+
       # TODO(dnfield): https://github.com/flutter/flutter/issues/50053
       "_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING",
     ]
@@ -41,6 +50,7 @@ group("impeller") {
       "entity",
       "image",
       "renderer",
+      "renderer/backend",
       "typographer",
     ]
   }
@@ -66,6 +76,7 @@ executable("impeller_unittests") {
       "image:image_unittests",
       "playground",
       "renderer:renderer_unittests",
+      "renderer/backend:backend_unittests",
       "typographer:typographer_unittests",
     ]
   }

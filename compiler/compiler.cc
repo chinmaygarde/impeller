@@ -38,9 +38,27 @@ static CompilerBackend CreateGLSLCompiler(const spirv_cross::ParsedIR& ir,
   if (source_options.target_platform == TargetPlatform::kOpenGLES) {
     sl_options.version = 100;
     sl_options.es = true;
+  } else {
+    sl_options.version = 120;
+    sl_options.es = false;
   }
   gl_compiler->set_common_options(sl_options);
   return gl_compiler;
+}
+
+static bool EntryPointMustBeNamedMain(TargetPlatform platform) {
+  switch (platform) {
+    case TargetPlatform::kUnknown:
+      FML_UNREACHABLE();
+    case TargetPlatform::kMetalDesktop:
+    case TargetPlatform::kMetalIOS:
+      return false;
+    case TargetPlatform::kFlutterSPIRV:
+    case TargetPlatform::kOpenGLES:
+    case TargetPlatform::kOpenGLDesktop:
+      return true;
+  }
+  FML_UNREACHABLE();
 }
 
 static CompilerBackend CreateCompiler(const spirv_cross::ParsedIR& ir,
@@ -62,8 +80,11 @@ static CompilerBackend CreateCompiler(const spirv_cross::ParsedIR& ir,
     return {};
   }
   auto* backend = compiler.GetCompiler();
-  backend->rename_entry_point("main", source_options.entry_point_name,
-                              ToExecutionModel(source_options.type));
+  if (!EntryPointMustBeNamedMain(source_options.target_platform)) {
+    backend->rename_entry_point("main", source_options.entry_point_name,
+                                ToExecutionModel(source_options.type));
+  }
+
   return compiler;
 }
 

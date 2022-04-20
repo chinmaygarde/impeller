@@ -157,7 +157,7 @@ std::optional<nlohmann::json> Reflector::GenerateTemplateArguments() const {
   }
 
   {
-    root["entrypoint"] = entrypoints.front().name;
+    root["entrypoint"] = options_.entry_point_name;
     root["shader_name"] = options_.shader_name;
     root["shader_stage"] =
         ExecutionModelToString(entrypoints.front().execution_model);

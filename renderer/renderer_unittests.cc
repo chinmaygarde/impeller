@@ -4,12 +4,12 @@
 
 #include "flutter/fml/time/time_point.h"
 #include "flutter/testing/testing.h"
-#include "impeller/fixtures/mtl/box_fade.frag.h"
-#include "impeller/fixtures/mtl/box_fade.vert.h"
-#include "impeller/fixtures/mtl/instanced_draw.frag.h"
-#include "impeller/fixtures/mtl/instanced_draw.vert.h"
-#include "impeller/fixtures/mtl/test_texture.frag.h"
-#include "impeller/fixtures/mtl/test_texture.vert.h"
+#include "impeller/fixtures/box_fade.frag.h"
+#include "impeller/fixtures/box_fade.vert.h"
+#include "impeller/fixtures/instanced_draw.frag.h"
+#include "impeller/fixtures/instanced_draw.vert.h"
+#include "impeller/fixtures/test_texture.frag.h"
+#include "impeller/fixtures/test_texture.vert.h"
 #include "impeller/geometry/path_builder.h"
 #include "impeller/image/compressed_image.h"
 #include "impeller/image/decompressed_image.h"
@@ -273,7 +273,11 @@ TEST_P(RendererTest, CanRenderToTexture) {
   ASSERT_TRUE(r2t_pass->EncodeCommands(*context->GetTransientsAllocator()));
 }
 
+#if IMPELLER_ENABLE_METAL
 TEST_P(RendererTest, CanRenderInstanced) {
+  if (GetBackend() != PlaygroundBackend::kMetal) {
+    GTEST_SKIP_("Instancing is only supported on Metal.");
+  }
   using VS = InstancedDrawVertexShader;
   using FS = InstancedDrawFragmentShader;
 
@@ -328,6 +332,7 @@ TEST_P(RendererTest, CanRenderInstanced) {
     return true;
   }));
 }
+#endif  // IMPELLER_ENABLE_METAL
 
 }  // namespace testing
 }  // namespace impeller
